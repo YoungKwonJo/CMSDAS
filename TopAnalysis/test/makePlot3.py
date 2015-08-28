@@ -168,6 +168,8 @@ model3.fitTo(data)
 
 
 print "k1:"+str(k1.getVal())+", err:"+str(k1.getError())+", init:"+str(rttbar)
+#k1 : ratio = ttbar/(ttbar+background)
 print "k2:"+str(k2.getVal())+", err:"+str(k2.getError())
+#k2 : nomalized factor of MC(ttbar+background) and without qcd
 
 
