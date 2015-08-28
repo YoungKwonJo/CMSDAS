@@ -1,9 +1,12 @@
 #! /usr/bin/env python
 
-from ROOT import TStyle, TF1, TFile, TCanvas, gDirectory, TTree, TH1F, TH2F, THStack, TLegend, gROOT 
+from ROOT import TStyle, TF1, TFile, TCanvas, gDirectory, TTree, TH1F, TH2F, THStack, TLegend, gROOT,TGraphErrors
 from ROOT import RooRealVar,RooFormulaVar,RooDataHist,RooHistPdf,RooAddPdf,RooArgList,RooFit,RooMinuit,RooAbsData
 from CrossSectionTable import *
 import ROOT
+from array import array
+
+
 ROOT.gROOT.Macro("rootlogon.C")
 #Hist = "nJetsHist"
 Hist = "m3Hist"
@@ -55,7 +58,9 @@ h_ttbar_m3HistS.Scale(scale_ttbar)
 h_wjets_m3HistS.Scale(scale_wjets)
 h_singletop_t_m3HistS.Scale(scale_singletop_t)
 h_zjets_m3HistS.Scale(scale_zjets)
-h_qcd_data_m3HistS.Scale(1/h_qcd_data_m3Hist.Integral()*n_qcd)
+h_qcd_data_m3HistS.Scale(1/h_qcd_data_m3HistS.Integral()*n_qcd)
+
+
 
 h_ttbar_m3Hist.SetFillColor(ROOT.kRed+1)
 h_wjets_m3Hist.SetFillColor(ROOT.kGreen-3)
@@ -71,7 +76,7 @@ s.Add(h_singletop_t_m3Hist)
 s.Add(h_zjets_m3Hist)
 s.Add(h_qcd_data_m3Hist)
 s.Draw()
-#s.SetMaximum(65)
+s.SetMaximum(65)
 s.GetXaxis().SetTitle("M3 (GeV)")
 s.GetYaxis().SetTitle("Number of Events")
 
@@ -105,6 +110,33 @@ l.SetTextSize(0.05);
 l.SetLineColor(0);
 l.SetFillColor(0);
 l.Draw()
+
+hmctotqcd = h_ttbar_m3HistS.Clone("hmctotqcd")
+hmctotqcd.Add(h_wjets_m3HistS)
+hmctotqcd.Add(h_singletop_t_m3HistS)
+hmctotqcd.Add(h_zjets_m3HistS)
+hmctotqcd.Add(h_qcd_data_m3HistS)
+
+xx=[]
+xxer=[]
+yy=[]
+yyer=[]
+for i in range(0, hmctotqcd.GetNbinsX()+2 ):
+  yy.append(  float(hmctotqcd.GetBinContent(i)))
+  yyer.append(float(hmctotqcd.GetBinError(i)))
+  xx.append(  float(hmctotqcd.GetBinCenter(i)))
+  xxer.append(float(hmctotqcd.GetBinWidth(i)/2))
+
+x_   = array("d",xx)
+xer = array("d",xxer)
+y_   = array("d",yy)
+yer = array("d",yyer)
+gr = TGraphErrors(len(x_), x_,y_,xer,yer)
+gr.SetFillColor(ROOT.kBlack);
+#gr.SetFillStyle(3144);
+gr.SetFillStyle(3244);
+gr.Draw("same,2")
+
 
 c.Print("m3Hist.png")
 
@@ -209,4 +241,83 @@ print "mctotal = " +str(n_mctotal2)
 print "Data = " + str(n_data) 
 print "QCD = " + str(37.03) 
 print "####################"
+
+h_ttbar_m3Hist2       =h_ttbar_m3Hist      .Clone("ttbarN")
+h_wjets_m3Hist2       =h_wjets_m3Hist      .Clone("wjetsN")
+h_singletop_t_m3Hist2 =h_singletop_t_m3Hist.Clone("stopN")
+h_zjets_m3Hist2       =h_zjets_m3Hist      .Clone("zjetsN")
+h_qcd_data_m3Hist2    =h_qcd_data_m3Hist   .Clone("qcdN")
+
+h_ttbar_m3Hist2      .Scale(1/h_ttbar_m3Hist2      .Integral()*n_ttbar2)
+h_wjets_m3Hist2      .Scale(1/h_wjets_m3Hist2      .Integral()*n_wjets2)  
+h_singletop_t_m3Hist2.Scale(1/h_singletop_t_m3Hist2.Integral()*n_singletop_t2)
+h_zjets_m3Hist2      .Scale(1/h_zjets_m3Hist2      .Integral()*n_zjets2)
+
+c2 = TCanvas("c2","c",600,600)
+s = THStack("hs","")
+s.Add(h_ttbar_m3Hist2      )
+s.Add(h_wjets_m3Hist2      )
+s.Add(h_singletop_t_m3Hist2)
+s.Add(h_zjets_m3Hist2      )
+s.Add(h_qcd_data_m3Hist2   ) 
+s.Draw()
+s.SetMaximum(65)
+s.GetXaxis().SetTitle("M3 (GeV)")
+s.GetYaxis().SetTitle("Number of Events")
+
+h_data_m3Hist.Draw("sameP")
+h_data_m3Hist.SetMarkerStyle(20)
+h_data_m3Hist.SetMarkerSize(0.9)
+
+l = TLegend(0.60,0.58,0.82,0.88)
+l.AddEntry(h_ttbar_m3Hist2,"ttbar","F")
+l.AddEntry(h_wjets_m3Hist2,"wjets","F")
+l.AddEntry(h_singletop_t_m3Hist2,"singletop","F")
+l.AddEntry(h_zjets_m3Hist2,"zjets","F")
+l.AddEntry(h_qcd_data_m3Hist2,"qcd","F")
+l.AddEntry(h_data_m3Hist,"data","P")
+l.SetTextSize(0.05);
+l.SetLineColor(0);
+l.SetFillColor(0);
+l.Draw()
+
+h_ttbar_m3Hist2S       =h_ttbar_m3HistS      .Clone("ttbarNS")
+h_wjets_m3Hist2S       =h_wjets_m3HistS      .Clone("wjetsNS")
+h_singletop_t_m3Hist2S =h_singletop_t_m3HistS.Clone("stopNS")
+h_zjets_m3Hist2S       =h_zjets_m3HistS      .Clone("zjetsNS")
+h_qcd_data_m3Hist2S    =h_qcd_data_m3HistS   .Clone("qcdNS")
+
+h_ttbar_m3Hist2S      .Scale(1/h_ttbar_m3Hist2S      .Integral()*n_ttbar2)
+h_wjets_m3Hist2S      .Scale(1/h_wjets_m3Hist2S      .Integral()*n_wjets2)  
+h_singletop_t_m3Hist2S.Scale(1/h_singletop_t_m3Hist2S.Integral()*n_singletop_t2)
+h_zjets_m3Hist2S      .Scale(1/h_zjets_m3Hist2S      .Integral()*n_zjets2)
+
+hmctotqcd2 = h_ttbar_m3Hist2S.Clone("hmctotqcd")
+hmctotqcd2.Add(h_wjets_m3Hist2S)
+hmctotqcd2.Add(h_singletop_t_m3Hist2S)
+hmctotqcd2.Add(h_zjets_m3Hist2S)
+hmctotqcd2.Add(h_qcd_data_m3HistS)
+
+xx2=[]
+xxer2=[]
+yy2=[]
+yyer2=[]
+for i in range(0, hmctotqcd2.GetNbinsX()+2 ):
+  yy2.append(  float(hmctotqcd2.GetBinContent(i)))
+  yyer2.append(float(hmctotqcd2.GetBinError(i)))
+  xx2.append(  float(hmctotqcd2.GetBinCenter(i)))
+  xxer2.append(float(hmctotqcd2.GetBinWidth(i)/2))
+
+x2_   = array("d",xx2)
+xer2 = array("d",xxer2)
+y2_   = array("d",yy2)
+yer2 = array("d",yyer2)
+gr2 = TGraphErrors(len(x2_), x2_,y2_,xer2,yer2)
+gr2.SetFillColor(ROOT.kBlack);
+#gr2.SetFillStyle(3144);
+gr2.SetFillStyle(3244);
+gr2.Draw("same,2")
+
+c.Print("m3HistNew.png")
+
 

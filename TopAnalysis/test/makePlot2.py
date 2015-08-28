@@ -22,7 +22,7 @@ h_qcd_data_m3Hist = f_qcd.Get(histname)
 
 lumi_data = 46.48  #data
 lumi_ttbar = 38662 / Xsection["TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"] 
-lumi_wjets = 2859761 /Xsection["WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"]  
+lumi_wjets = 9993300 /Xsection["WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"]  
 lumi_singletop_t = 6322 / Xsection["ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1"] 
 lumi_zjets = 280051 / Xsection["DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"]
 
