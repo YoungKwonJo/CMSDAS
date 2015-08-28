@@ -122,6 +122,24 @@ jetPtHist = ROOT.TH1F('jetPtHist', 'Jet p_{T}', 150, 0., 600.)
 m3Hist = ROOT.TH1F('m3Hist', 'M3 Histogram', 150, 0., 600.)
 nJetsHist = ROOT.TH1F('nJetsHist','Number of Jets', 10, 0, 10)
 
+secvtxMassHistS = ROOT.TH1F('secvtxMassHistS', "Secondary Vertex Mass", 150, 0., 5.0)
+secvtxMassHistBS = ROOT.TH1F('secvtxMassHistBS', "Secondary Vertex Mass, b jets", 150, 0., 5.0)
+secvtxMassHistCS = ROOT.TH1F('secvtxMassHistCS', "Secondary Vertex Mass, c jets", 150, 0., 5.0)
+secvtxMassHistLS = ROOT.TH1F('secvtxMassHistLS', "Secondary Vertex Mass, udsg jets", 150, 0., 5.0)
+metVsIsoS = ROOT.TH2F('metVsIsoS', 'MET Versus PFIsolation', 15, 0., 150., 200, 0., 4.0)
+jetPtHistS = ROOT.TH1F('jetPtHistS', 'Jet p_{T}', 150, 0., 600.)
+m3HistS = ROOT.TH1F('m3HistS', 'M3 Histogram', 150, 0., 600.)
+nJetsHistS = ROOT.TH1F('nJetsHistS','Number of Jets', 10, 0, 10)
+
+
+secvtxMassHistS.Sumw2()
+secvtxMassHistBS.Sumw2()
+secvtxMassHistCS.Sumw2()
+secvtxMassHistLS.Sumw2()
+metVsIsoS.Sumw2()
+jetPtHistS.Sumw2() 
+m3HistS.Sumw2() 
+nJetsHistS.Sumw2() 
 
 ############################################
 # Physics level parameters for systematics #
@@ -222,19 +240,25 @@ for event in events:
         ijetP4.SetPtEtaPhiM( jets[ijet].pt(), jets[ijet].eta(), jets[ijet].phi(), jets[ijet].mass() )
         jets_p4.append( ijetP4 )
         jetPtHist.Fill( jets[ijet].pt() )
+        jetPtHistS.Fill( jets[ijet].pt() )
         tagName = "pfCombinedInclusiveSecondaryVertexV2BJetTags"
         if jets[ijet].bDiscriminator(tagName) > 0.890:
             ntags = ntags + 1
             jetSecvtxMass = jets[ijet].vtxMass()
             secvtxMassHist.Fill( jetSecvtxMass )
+            secvtxMassHistS.Fill( jetSecvtxMass )
             if options.doMC :
                 if abs(jets[ijet].partonFlavour()) == 5 :
                     secvtxMassHistB.Fill( jetSecvtxMass )
+                    secvtxMassHistBS.Fill( jetSecvtxMass )
                 elif abs(jets[ijet].partonFlavour()) == 4 :
                     secvtxMassHistC.Fill( jetSecvtxMass )
+                    secvtxMassHistCS.Fill( jetSecvtxMass )
                 else :
                     secvtxMassHistL.Fill( jetSecvtxMass )
+                    secvtxMassHistLS.Fill( jetSecvtxMass )
     nJetsHist.Fill(njets) 
+    nJetsHistS.Fill(njets) 
     # We're not interested in <=4 jets
     if njets < minJets :
         continue
@@ -319,6 +343,7 @@ for event in events:
 
     # Make a plot of the MET versus ISO for normalization purposes
     metVsIso.Fill( met, lepIso )
+    metVsIsoS.Fill( met, lepIso )
 
     # If the MET is lower than our cut, skip, unless we want it inverted
     if not options.invertMET :
@@ -348,6 +373,7 @@ for event in events:
                     m3 = sumP4.M()
     if maxPt > 0.0 :
         m3Hist.Fill( m3 )
+        m3HistS.Fill( m3 )
 
 # Stop our timer
 timer.Stop()
