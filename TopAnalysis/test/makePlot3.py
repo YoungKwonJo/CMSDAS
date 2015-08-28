@@ -46,7 +46,7 @@ scale_ttbar = lumi_data / lumi_ttbar
 scale_wjets = lumi_data / lumi_wjets
 scale_singletop_t = lumi_data / lumi_singletop_t
 scale_zjets = lumi_data / lumi_zjets
-n_qcd =41.
+n_qcd =41.03
 
 h_ttbar_m3Hist.Scale(scale_ttbar)
 h_wjets_m3Hist.Scale(scale_wjets)
@@ -97,7 +97,7 @@ print "singletop_t = " + str(n_singletop_t)
 print "zjets = " + str(n_zjets) 
 print "background = " + str(n_background)
 print "Data = " + str(n_data) 
-print "QCD = " + str(37.03) 
+print "QCD = " + str(n_qcd) 
 
 l = TLegend(0.60,0.58,0.82,0.88)
 l.AddEntry(h_ttbar_m3Hist,"ttbar","F")
@@ -223,7 +223,7 @@ print "zjets = " + str(n_zjets)
 print "background = " + str(n_background)
 print "mctotal = " +str(n_mctotal)
 print "Data = " + str(n_data) 
-print "QCD = " + str(37.03) 
+print "QCD = " + str(n_qcd) 
 print "####################"
 
 n_ttbar2 = ((n_ttbar+n_background)*k1.getVal())*k2.getVal()
@@ -239,7 +239,7 @@ print "zjets = " + str(n_zjets2)
 print "background = " + str(n_background2)
 print "mctotal = " +str(n_mctotal2)
 print "Data = " + str(n_data) 
-print "QCD = " + str(37.03) 
+print "QCD = " + str(n_qcd) 
 print "####################"
 
 h_ttbar_m3Hist2       =h_ttbar_m3Hist      .Clone("ttbarN")
