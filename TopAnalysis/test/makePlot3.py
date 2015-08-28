@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 from ROOT import TStyle, TF1, TFile, TCanvas, gDirectory, TTree, TH1F, TH2F, THStack, TLegend, gROOT 
-from ROOT import RooRealVar,RooFormulaVar,RooDataHist,RooHistPdf,RooAddPdf,RooArgList,RooFit,RooMinuit
+from ROOT import RooRealVar,RooFormulaVar,RooDataHist,RooHistPdf,RooAddPdf,RooArgList,RooFit,RooMinuit,RooAbsData
 from CrossSectionTable import *
 import ROOT
 ROOT.gROOT.Macro("rootlogon.C")
@@ -35,7 +35,7 @@ h_qcd_data_m3HistS = f_qcd_data.Get(HistS)
 
 lumi_data = 46.48  #data
 lumi_ttbar = 38662 / Xsection["TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"] 
-lumi_wjets = 2859761 /Xsection["WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"]  
+lumi_wjets = 9993300 /Xsection["WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"]  
 lumi_singletop_t = 6322 / Xsection["ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1"] 
 lumi_zjets = 280051 / Xsection["DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"]
  
@@ -43,7 +43,7 @@ scale_ttbar = lumi_data / lumi_ttbar
 scale_wjets = lumi_data / lumi_wjets
 scale_singletop_t = lumi_data / lumi_singletop_t
 scale_zjets = lumi_data / lumi_zjets
-n_qcd =37.03
+n_qcd =41.
 
 h_ttbar_m3Hist.Scale(scale_ttbar)
 h_wjets_m3Hist.Scale(scale_wjets)
@@ -65,7 +65,7 @@ h_qcd_data_m3Hist.SetFillColor(ROOT.kYellow)
 
 
 s = THStack("hs","")
-#s.Add(h_ttbar_m3Hist)
+s.Add(h_ttbar_m3Hist)
 s.Add(h_wjets_m3Hist)
 s.Add(h_singletop_t_m3Hist)
 s.Add(h_zjets_m3Hist)
@@ -133,7 +133,7 @@ nqcd = RooRealVar("nqcd","number of qcd events", n_qcd , n_qcd, n_qcd)
 
 data       = RooDataHist("data",      "data set with (x)", RooArgList(x), h_data_m3HistS)
 ttbar      = RooDataHist("ttbar",     "data set with (x)", RooArgList(x), h_ttbar_m3HistS)
-background = RooDataHist("background","data set with (x)", RooArgList(x), h_background_m3HistS)
+background = RooDataHist("background","data set with (x)", RooArgList(x), h_background_m3Hist)
 
 qcd        = RooDataHist("qcd",      "data set with (x)", RooArgList(x), h_qcd_data_m3HistS)
 # RooHistPdf::RooHistPdf(const char* name, const char* title, const RooArgSet& vars, const RooDataHist& dhist, int intOrder = 0) =>
@@ -166,10 +166,47 @@ model3.fitTo(data)
 #Rk1.SetTitle("")
 #Rk1.Draw()
 
+cR11 = TCanvas("R11", "R", 500, 500)
+xframe = x.frame()
+data.plotOn(xframe, RooFit.DataError(RooAbsData.SumW2) ) 
+model3.paramOn(xframe, RooFit.Layout(0.65,0.9,0.9) )
+model3.plotOn(xframe)
+chi2 = xframe.chiSquare(2)
+ndof = xframe.GetNbinsX()
+print "chi2 = "+ str(chi2)
+print "ndof = "+ str(ndof)
+xframe.Draw()
+
+
 
 print "k1:"+str(k1.getVal())+", err:"+str(k1.getError())+", init:"+str(rttbar)
-#k1 : ratio = ttbar/(ttbar+background)
 print "k2:"+str(k2.getVal())+", err:"+str(k2.getError())
-#k2 : nomalized factor of MC(ttbar+background) and without qcd
+n_mctotal = n_ttbar+n_background
 
+print "####################"
+print "ttbar = " + str(n_ttbar) 
+print "wjets = " + str(n_wjets) 
+print "singletop_t = " + str(n_singletop_t) 
+print "zjets = " + str(n_zjets) 
+print "background = " + str(n_background)
+print "mctotal = " +str(n_mctotal)
+print "Data = " + str(n_data) 
+print "QCD = " + str(37.03) 
+print "####################"
+
+n_ttbar2 = ((n_ttbar+n_background)*k1.getVal())*k2.getVal()
+n_wjets2 = (n_wjets/n_background)*(n_ttbar+n_background)*(1-k1.getVal())*k2.getVal()
+n_singletop_t2 = (n_singletop_t/n_background)*(n_ttbar+n_background)*(1-k1.getVal())*k2.getVal()
+n_zjets2 = (n_zjets/n_background)*(n_ttbar+n_background)*(1-k1.getVal())*k2.getVal()
+n_background2 = (n_ttbar+n_background)*(1-k1.getVal())*k2.getVal()
+n_mctotal2 = n_ttbar2+n_background2
+print "ttbar = " + str(n_ttbar2) 
+print "wjets = " + str(n_wjets2) 
+print "singletop_t = " + str(n_singletop_t2) 
+print "zjets = " + str(n_zjets2) 
+print "background = " + str(n_background2)
+print "mctotal = " +str(n_mctotal2)
+print "Data = " + str(n_data) 
+print "QCD = " + str(37.03) 
+print "####################"
 
